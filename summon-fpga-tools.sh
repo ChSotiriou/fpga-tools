@@ -51,6 +51,9 @@ YOSYS_CONFIG=${YOSYS_CONFIG:-}
 IVERILOG_EN=${IVERILOG_EN:-1}
 IVERILOG_GIT=${IVERILOG_GIT:-v10-branch}
 
+YOSYS_SYMBIFLOW_PLUGINS_EN=${YOSYS_SYMBIFLOW_PLUGINS_EN:-1}
+YOSYS_SYMBIFLOW_PLUGINS_GIT=${YOSYS_SYMBIFLOW_PLUGINS_GIT:-master}
+
 # Override automatic detection of cpus to compile on
 CPUS=${CPUS:-}
 
@@ -74,6 +77,7 @@ while [ $# -gt 0 ]; do
 		YOSYS_GIT=*|\
 		YOSYS_CONFIG=*|\
 		IVERILOG_GIT=*|\
+		YOSYS_SYMBIFLOW_PLUGINS_GIT=*|\
 		CPUS=*|\
 		NEXTPNR_BUILD_GUI=*|\
 		VERBOSE=*\
@@ -100,6 +104,7 @@ DEFAULT_NEXTPNR=
 DEFAULT_YOSYS=yosys-0.8
 DEFAULT_IVERILOG_VERSION=v10_2
 DEFAULT_IVERILOG=iverilog-${DEFAULT_IVERILOG_VERSION}
+DEFAULT_YOSYS_SYMBIFLOW_PLUGINS=
 
 ICESTORM=${ICESTORM:-${DEFAULT_ICESTORM}}
 PRJTRELLIS=${PRJTRELLIS:-${DEFAULT_PRJTRELLIS}}
@@ -108,6 +113,7 @@ NEXTPNR=${NEXTPNR:-${DEFAULT_NEXTPNR}}
 YOSYS=${YOSYS:-${DEFAULT_YOSYS}}${IVERILOG}
 IVERILOG_VERSION=${IVERILOG_VERSION:-${DEFAULT_IVERILOG_VERSION}}
 IVERILOG=${IVERILOG:-${DEFAULT_IVERILOG}}
+YOSYS_SYMBIFLOW_PLUGINS=${YOSYS_SYMBIFLOW_PLUGINS:-${DEFAULT_YOSYS_SYMBIFLOW_PLUGINS}}
 
 ##############################################################################
 # Print settings
@@ -132,6 +138,8 @@ echo "YOSYS_CONFIG=$YOSYS_CONFIG"
 echo "IVERILOG_VERSION=$IVERILOG_VERSION"
 echo "IVERILOG=$IVERILOG"
 echo "IVERILOG_GIT=$IVERILOG_GIT"
+echo "YOSYS_SYMBIFLOW_PLUGINS=$YOSYS_SYMBIFLOW_PLUGINS"
+echo "YOSYS_SYMBIFLOW_PLUGINS_GIT=$YOSYS_SYMBIFLOW_PLUGINS_GIT"
 echo "CPUS=$CPUS"
 
 ##############################################################################
@@ -386,6 +394,15 @@ if [ ${IVERILOG_EN} != 0 ]; then
 	fi
 fi
 
+if [ ${YOSYS_SYMBIFLOW_PLUGINS_EN} != 0 ]; then
+	echo "ysp git? ${YOSYS_SYMBIFLOW_PLUGINS_GIT}"
+	if [ "x${YOSYS_SYMBIFLOW_PLUGINS_GIT}" == "x" ]; then
+		fetch yosys-symbiflow-plugins https://github.com/SymbiFlow/yosys-symbiflow-plugins/archive/${YOSYS_SYMBIFLOW_PLUGINS}.tar.gz
+	else
+		clone yosys-symbiflow-plugins ${YOSYS_SYMBIFLOW_PLUGINS_GIT} git://github.com/SymbiFlow/yosys-symbiflow-plugins.git
+	fi
+fi
+
 ##############################################################################
 # Build tools
 ##############################################################################
@@ -494,4 +511,16 @@ if [ ${IVERILOG_EN} != 0 ] && [ ! -e ${STAMPS}/${IVERILOG}.build ]; then
     log "Cleaning up ${IVERILOG}"
     touch ${STAMPS}/${IVERILOG}.build
     rm -rf build/* ${IVERILOG}
+fi
+
+if [ ${YOSYS_SYMBIFLOW_PLUGINS_EN} != 0 ] && [ ! -e ${STAMPS}/${YOSYS_SYMBIFLOW_PLUGINS}.build ]; then
+    unpack ${YOSYS_SYMBIFLOW_PLUGINS}
+    cd ${YOSYS_SYMBIFLOW_PLUGINS}
+    log "Building ${YOSYS_SYMBIFLOW_PLUGINS}"
+    make ${PARALLEL} ${MAKEFLAGS} PREFIX=${PREFIX}
+    install-parallel ${YOSYS_SYMBIFLOW_PLUGINS} PREFIX=${PREFIX} install
+    cd ..
+    log "Cleaning up ${YOSYS_SYMBIFLOW_PLUGINS}"
+    touch ${STAMPS}/${YOSYS_SYMBIFLOW_PLUGINS}.build
+    rm -rf ${YOSYS_SYMBIFLOW_PLUGINS}
 fi
