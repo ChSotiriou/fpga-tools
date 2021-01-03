@@ -247,7 +247,7 @@ function clone {
     fi
 
     # Setting uppercase NAME variable for future use to the source file name
-    eval $(echo ${NAME} | tr "[:lower:]" "[:upper:]")=${NAME}-${GIT_SHA}
+    eval $(echo "${NAME}" | tr - _ | tr "[:lower:]" "[:upper:]")=${NAME}-${GIT_SHA}
 
     # Clone the repository and do all necessary operations until we get an archive
     if [ ! -e ${STAMPS}/${NAME}-${GIT_SHA}.fetch ]; then
