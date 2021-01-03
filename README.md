@@ -29,6 +29,8 @@ releases of all the tools.
 You will need to install the following dependencies to be able to run this
 script.
 
+vtr requires tbb. TODO: add the deps for opensuse and osx.
+
 ### Debian/Ubuntu/Mint/Raspbian
 
 ```
@@ -38,7 +40,7 @@ sudo apt-get install git mercurial build-essential bison clang cmake \
                      libmpfr-dev libncurses5-dev libmpc-dev \
                      libreadline-dev zlib1g-dev pkg-config python \
                      python3 python3-dev tcl-dev autoconf gperf \
-                     qtbase5-dev libqt5opengl5-dev
+                     qtbase5-dev libqt5opengl5-dev libtbb-dev
 ```
 
 ### openSUSE
