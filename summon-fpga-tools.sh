@@ -53,6 +53,8 @@ IVERILOG_GIT=${IVERILOG_GIT:-v10-branch}
 
 YOSYS_SYMBIFLOW_PLUGINS_EN=${YOSYS_SYMBIFLOW_PLUGINS_EN:-1}
 YOSYS_SYMBIFLOW_PLUGINS_GIT=${YOSYS_SYMBIFLOW_PLUGINS_GIT:-master}
+VTR_EN=${VTR_EN:-1}
+VTR_GIT=${VTR_GIT:-master}
 
 # Override automatic detection of cpus to compile on
 CPUS=${CPUS:-}
@@ -114,6 +116,7 @@ YOSYS=${YOSYS:-${DEFAULT_YOSYS}}${IVERILOG}
 IVERILOG_VERSION=${IVERILOG_VERSION:-${DEFAULT_IVERILOG_VERSION}}
 IVERILOG=${IVERILOG:-${DEFAULT_IVERILOG}}
 YOSYS_SYMBIFLOW_PLUGINS=${YOSYS_SYMBIFLOW_PLUGINS:-${DEFAULT_YOSYS_SYMBIFLOW_PLUGINS}}
+VTR=${VTR:-${DEFAULT_VTR}}
 
 ##############################################################################
 # Print settings
@@ -140,6 +143,9 @@ echo "IVERILOG=$IVERILOG"
 echo "IVERILOG_GIT=$IVERILOG_GIT"
 echo "YOSYS_SYMBIFLOW_PLUGINS=$YOSYS_SYMBIFLOW_PLUGINS"
 echo "YOSYS_SYMBIFLOW_PLUGINS_GIT=$YOSYS_SYMBIFLOW_PLUGINS_GIT"
+echo "VTR=$VTR"
+echo "VTR_GIT=$VTR_GIT"
+
 echo "CPUS=$CPUS"
 
 ##############################################################################
@@ -403,6 +409,14 @@ if [ ${YOSYS_SYMBIFLOW_PLUGINS_EN} != 0 ]; then
 	fi
 fi
 
+if [ ${VTR_EN} != 0 ]; then
+	if [ "x${VTR_GIT}" == "x" ]; then
+		fetch ${VTR} https://github.com/SymbiFlow/vtr-verilog-to-routing/archive/${VTR_VERSION}.tar.gz ${VTR}.tar.gz
+	else
+		clone vtr ${VTR_GIT} git://github.com/SymbiFlow/vtr-verilog-to-routing.git
+	fi
+fi
+
 ##############################################################################
 # Build tools
 ##############################################################################
@@ -523,4 +537,20 @@ if [ ${YOSYS_SYMBIFLOW_PLUGINS_EN} != 0 ] && [ ! -e ${STAMPS}/${YOSYS_SYMBIFLOW_
     log "Cleaning up ${YOSYS_SYMBIFLOW_PLUGINS}"
     touch ${STAMPS}/${YOSYS_SYMBIFLOW_PLUGINS}.build
     rm -rf ${YOSYS_SYMBIFLOW_PLUGINS}
+fi
+
+if [ ${VTR_EN} != 0 ] && [ ! -e ${STAMPS}/${VTR}.build ]; then
+    unpack ${VTR}
+    cd build
+    log "Configuring ${VTR}"
+    # Disable ABC and ODIN to save build time
+    cmake -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_BUILD_TYPE=Release \
+	    -DWITH_ODIN=OFF -DWITH_ABC=OFF -DCMAKE_INSTALL_PREFIX=${PREFIX} ../${VTR}
+    log "Building ${VTR}"
+    make ${PARALLEL} ${MAKEFLAGS}
+    install-parallel ${VTR} install
+    cd ..
+    log "Cleaning up ${VTR}"
+    touch ${STAMPS}/${VTR}.build
+    rm -rf build/* ${VTR}
 fi
