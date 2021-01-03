@@ -397,7 +397,7 @@ fi
 if [ ${YOSYS_SYMBIFLOW_PLUGINS_EN} != 0 ]; then
 	echo "ysp git? ${YOSYS_SYMBIFLOW_PLUGINS_GIT}"
 	if [ "x${YOSYS_SYMBIFLOW_PLUGINS_GIT}" == "x" ]; then
-		fetch yosys-symbiflow-plugins https://github.com/SymbiFlow/yosys-symbiflow-plugins/archive/${YOSYS_SYMBIFLOW_PLUGINS}.tar.gz
+		fetch ${YOSYS_SYMBIFLOW_PLUGINS} https://github.com/SymbiFlow/yosys-symbiflow-plugins/archive/${YOSYS_SYMBIFLOW_PLUGINS}.tar.gz
 	else
 		clone yosys-symbiflow-plugins ${YOSYS_SYMBIFLOW_PLUGINS_GIT} git://github.com/SymbiFlow/yosys-symbiflow-plugins.git
 	fi
