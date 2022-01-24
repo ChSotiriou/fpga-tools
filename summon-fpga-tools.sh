@@ -52,6 +52,8 @@ IVERILOG_EN=${IVERILOG_EN:-1}
 IVERILOG_GIT=${IVERILOG_GIT:-v10-branch}
 GHDL_EN=${GHDL_EN:-1}
 GHDL_GIT=${GHDL_GIT:-master}
+YOSYS_GHDL_EN=${YOSYS_GHDL_EN:-1}
+YOSYS_GHDL_GIT=${YOSYS_GHDL_GIT:-master}
 
 # Override automatic detection of cpus to compile on
 CPUS=${CPUS:-}
@@ -396,6 +398,14 @@ if [ ${GHDL_EN} != 0 ]; then
 	fi
 fi
 
+if [ ${YOSYS_GHDL_EN} != 0 ]; then
+	if [ "x${YOSYS_GHDL_GIT}" == "x" ]; then
+            echo "Not Supported"
+	else
+		clone yosys_ghdl ${YOSYS_GHDL_GIT} https://github.com/ghdl/ghdl-yosys-plugin.git
+        fi
+fi
+
 ##############################################################################
 # Build tools
 ##############################################################################
@@ -518,4 +528,17 @@ if [ ${GHDL_EN} != 0 ] && [ ! -e ${STAMPS}/${GHDL}.build ]; then
     log "Cleaning up ${GHDL}"
     touch ${STAMPS}/${GHDL}.build
     rm -rf build/* ${GHDL}
+fi
+
+if [ ${YOSYS_GHDL_EN} != 0 ] && [ ! -e ${STAMPS}/${YOSYS_GHDL}.build ]; then
+    unpack ${YOSYS_GHDL}
+    cd ${YOSYS_GHDL}
+    log "Building ${YOSYS_GHDL}"
+    make ${PARALLEL} ${MAKEFLAGS}
+    mkdir -p "${PREFIX}/share/yosys/plugins"
+    mv ghdl.so "${PREFIX}/share/yosys/plugins"
+    cd ..
+    log "Cleaning up ${YOSYS_GHDL}"
+    touch ${STAMPS}/${YOSYS_GHDL}.build
+    rm -rf build/* ${YOSYS_GHDL}
 fi

@@ -1,3 +1,4 @@
+#!/bin/sh
 
 VIRTUAL_ENV="FPGA Env"
 
@@ -9,5 +10,8 @@ else
     PS1="\[\033[1;35m\]\342\246\227${VIRTUAL_ENV}\342\246\230\[\033[0m\] ${PS1-}"
 fi
 export PS1
+
+# create alias for yosys to include ghdl
+alias yosys='yosys -m ghdl'
 
 export PATH=~/sft/bin:$PATH
