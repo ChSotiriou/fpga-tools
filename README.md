@@ -4,12 +4,14 @@ This repository contains a simple but flexible script that builds a open-source
 FPGA tools. These tools consist from:
 
 * Yosys
+    * ghdl-yosys-plugin
 * prjtrellis
 * nextpnr-ice40
 * nextpnr-ecp5
 * arachne-pnr
 * icestorm
 * icarus-verilog
+* ghdl
 
 More tools will be added over time. The current candidates are:
 
